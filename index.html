@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+        <link rel="stylesheet" href="/static/index.css" />
+        <script type="module" src="/static/index.js"></script>
+        <script src="/static/unsupportedAlert.js"></script>
+        <title>AdvantageTrack</title>
+    </head>
+
+    <body>
+        <div class="sidebar">
+            <div class="welcome-message"></div>
+            <div class="sign-in-button">Click to sign in</div>
+
+            <div class="here-now-shadow"></div>
+            <div class="here-now-section">
+                <div class="here-now-title">
+                    Who's Here?
+                    <br />
+                    Click your name to sign out
+                    <br />
+                    <span style="text-decoration: underline">Underlined</span> names will be signed out automatically
+                </div>
+                <div class="here-now-warning" hidden>!!! Cannot connect to server !!!</div>
+                <div class="here-now-warning" hidden>!!! Cannot connect to Google !!!</div>
+                <table class="here-now-table">
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="manage-devices-button">Manage devices</div>
+            <div class="status-lights">
+                <div class="disconnected">Server</div>
+                <div class="disconnected">Monitor</div>
+                <div class="disconnected">Google</div>
+            </div>
+        </div>
+
+        <div class="popup-menu">
+            <div class="people-list">
+                <div class="close-button">(<span>Close</span>)</div>
+                <div class="title">Click your name to sign in</div>
+                <div class="warning" hidden>!!! Cannot connect to server !!!</div>
+                <div class="warning" hidden>!!! Cannot connect to Google !!!</div>
+                <table>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div>
+                <div class="thanks-message">
+                    <span>Thank you!</span>
+                    <br />
+                    <br />
+                    <span>Please sign out when you leave.</span>
+                </div>
+            </div>
+            <div class="people-list">
+                <div class="close-button">(<span>Close</span>)</div>
+                <div class="title">Click your name to manage your devices</div>
+                <div class="warning" hidden>!!! Cannot connect to server !!!</div>
+                <div class="warning" hidden>!!! Cannot connect to Google !!!</div>
+                <table>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="manage-devices-details">
+                <div class="close-button">(<span>Close</span>)</div>
+                <div class="title"><span></span>'s Devices</div>
+                <div>
+                    To register a new device:
+                    <ol>
+                        <li>Connect to our Wi-Fi network.</li>
+                        <li>Navigate to "<span class="add-address"></span>" in a web browser.</li>
+                    </ol>
+                </div>
+                <div>0 devices registered.</div>
+                <div></div>
+            </div>
+        </div>
+
+        <div id="sidebarBackground"></div>
+        <div id="blurredBackgroundDiv">
+            <canvas id="blurredBackgroundCanvas"></canvas>
+        </div>
+        <canvas id="backgroundCanvas"></canvas>
+        <div id="backgroundImages" hidden>
+            <img src="/backgrounds/granite-state-1.jpg" />
+            <img src="/backgrounds/greater-boston-1.jpg" />
+            <img src="/backgrounds/worlds-1.jpg" />
+            <img src="/backgrounds/granite-state-2.jpg" />
+            <img src="/backgrounds/worlds-5.jpg" />
+            <img src="/backgrounds/greater-boston-2.jpg" />
+            <img src="/backgrounds/worlds-2.jpg" />
+            <img src="/backgrounds/granite-state-3.jpg" />
+            <img src="/backgrounds/greater-boston-3.jpg" />
+            <img src="/backgrounds/worlds-3.jpg" />
+            <img src="/backgrounds/granite-state-4.jpg" />
+            <img src="/backgrounds/worlds-6.jpg" />
+            <img src="/backgrounds/greater-boston-4.jpg" />
+            <img src="/backgrounds/worlds-4.jpg" />
+        </div>
+    </body>
+</html>

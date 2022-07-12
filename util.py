@@ -5,6 +5,7 @@ from enum import Enum
 
 def log(output, before_text=""):
     '''Log the output with a timestamp.'''
+
     if before_text == "":
         print(time.strftime("[%d/%b/%Y:%H:%M:%S] ") + output)
     else:
@@ -21,5 +22,5 @@ class ConnectionStatus(Enum):
     '''The connection status of a single module.'''
 
     DISCONNECTED = 0
-    ERROR = 1
+    WARNING = 1
     CONNECTED = 2

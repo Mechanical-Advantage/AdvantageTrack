@@ -90,6 +90,9 @@ class WebServer:
             query = message["query"]
             data = message["data"]
 
+            log("Received query \"" + query + "\"",
+                before_text=self.peer_address[0])
+
             if query == "sign_in":
                 self._parent._sign_in_callback(data)
             elif query == "sign_out":

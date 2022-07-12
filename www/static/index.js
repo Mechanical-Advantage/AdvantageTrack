@@ -13,7 +13,7 @@ const serverStatusElement = document.getElementsByClassName("status-lights")[0].
 const monitorStatusElement = document.getElementsByClassName("status-lights")[0].children[1];
 const googleStatusElement = document.getElementsByClassName("status-lights")[0].children[2];
 
-// Status of each connection (0 = disconnected, 1 = error, 2 = connected)
+// Status of each connection (0 = disconnected, 1 = warning, 2 = connected)
 window.serverStatus = 0;
 window.monitorStatus = 0;
 window.googleStatus = 0;
@@ -30,14 +30,14 @@ function updateStatusLights() {
         [googleStatusElement, window.googleStatus]
     ).forEach((item) => {
         item[0].classList.remove("disconnected");
-        item[0].classList.remove("error");
+        item[0].classList.remove("warning");
         item[0].classList.remove("connected");
         switch (item[1]) {
             case 0:
                 item[0].classList.add("disconnected");
                 break;
             case 1:
-                item[0].classList.add("error");
+                item[0].classList.add("warning");
                 break;
             case 2:
                 item[0].classList.add("connected");

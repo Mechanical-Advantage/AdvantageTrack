@@ -34,8 +34,8 @@ class GoogleInterface:
 
     _SCOPES = ["https://www.googleapis.com/auth/drive",
                "https://spreadsheets.google.com/feeds"]
-    _CONFIG_KEYS = ["welcome_message", "background_folder", "ip_range_start",
-                    "ip_range_end", "ping_cycle_delay", "ping_timeout", "ping_backoff_length"]
+    _CONFIG_KEYS = ["welcome_message", "background_folder", "ip_range_start", "ip_range_end", "ping_cycle_delay",
+                    "ping_timeout", "ping_backoff_length", "monitor_grace_period", "monitor_threshold", "monitor_extension"]
     _RECENT_RECORDS = 500  # Number of records to retrieve
     _CONFIG_CACHE_TIMES = [30, 60]
     _DATA_CACHE_TIMES = [10, 20, 30, 40, 50, 60]
@@ -64,7 +64,6 @@ class GoogleInterface:
         self._status_callback = status_callback
         self._config_callback = config_callback
         self._data_callback = data_callback
-        self._auth()
 
     def _set_connection_status(self, status):
         '''Sets the current connection status and updates it externally if necessary.'''
@@ -121,7 +120,7 @@ class GoogleInterface:
         if len(missing_sheets) > 0:
             log("Could not find one or more sheets: " +
                 ", ".join(["\"" + x + "\"" for x in missing_sheets]))
-            self._set_connection_status(ConnectionStatus.ERROR)
+            self._set_connection_status(ConnectionStatus.WARNING)
             return False
 
         log("Successfully connected to Google")
@@ -161,11 +160,12 @@ class GoogleInterface:
                             "graduation_year": int(row[5]) if len(row) >= 6 and row[5] != "" else None
                         })
         except:
-            log("Failed to read config data from Google")
-            self._set_connection_status(ConnectionStatus.ERROR)
+            log("Failed to read config from Google")
+            self._set_connection_status(ConnectionStatus.WARNING)
             return None
         else:
             if send_result:
+                log("Updated config from Google")
                 self._config_callback(config)
             return config
 
@@ -203,10 +203,11 @@ class GoogleInterface:
                         })
         except:
             log("Failed to read data from Google")
-            self._set_connection_status(ConnectionStatus.ERROR)
+            self._set_connection_status(ConnectionStatus.WARNING)
             return None
         else:
             if send_result:
+                log("Updated data from Google")
                 self._data_callback(data)
             return data
 
@@ -238,7 +239,7 @@ class GoogleInterface:
 
         except:
             log("Failed to send sign-in data to Google")
-            self._set_connection_status(ConnectionStatus.ERROR)
+            self._set_connection_status(ConnectionStatus.WARNING)
             return False
         else:
             log("Sent new sign-in data to Google")
@@ -274,7 +275,7 @@ class GoogleInterface:
 
         except:
             log("Failed to send sign-out data to Google")
-            self._set_connection_status(ConnectionStatus.ERROR)
+            self._set_connection_status(ConnectionStatus.WARNING)
             return False
         else:
             log("Sent new sign-out data to Google")
@@ -307,7 +308,7 @@ class GoogleInterface:
 
         except:
             log("Failed to device registration data to Google")
-            self._set_connection_status(ConnectionStatus.ERROR)
+            self._set_connection_status(ConnectionStatus.WARNING)
             return False
         else:
             log("Sent new device registration data to Google")
@@ -338,7 +339,7 @@ class GoogleInterface:
 
         except:
             log("Failed to send device removal data to Google")
-            self._set_connection_status(ConnectionStatus.ERROR)
+            self._set_connection_status(ConnectionStatus.WARNING)
             return False
         else:
             log("Sent new device removal data to Google")
@@ -371,7 +372,7 @@ class GoogleInterface:
 
         except:
             log("Failed to send device update data to Google")
-            self._set_connection_status(ConnectionStatus.ERROR)
+            self._set_connection_status(ConnectionStatus.WARNING)
             return False
         else:
             log("Sent new device update data to Google")

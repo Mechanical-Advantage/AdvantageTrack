@@ -39,10 +39,12 @@ def get_mac_address(ip_address):
             if len(output) >= 4:
                 words = [x for x in output[3].split(" ") if len(x) > 0]
                 if len(words) >= 2:
-                    mac_address = words[1].lower().replace("-", ":")
+                    mac_address = words[1]
 
-    # Verify result
+    # Clean up & verify result
     if mac_address != None:
+        mac_address = mac_address.lower().replace("-", ":")
+        mac_address = ":".join([x.zfill(2) for x in mac_address.split(":")])
         if valid_mac_address_pattern.match(mac_address) == None:
             mac_address = None
 

@@ -214,7 +214,7 @@ div.status-lights div.disconnected {
     background-color: #ff2626;
 }
 
-div.status-lights div.error {
+div.status-lights div.warning {
     background-color: #ffa600;
 }
 

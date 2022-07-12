@@ -65,7 +65,7 @@ class WebServer:
                     self._parent._auto_add_person, mac_address)
 
             # Create response
-            html = open(get_absolute_path("add.html")).read()
+            html = open(get_absolute_path("www/add.html")).read()
             if mac_address == None:
                 html = html.replace("$(RESULT)", "FAILURE-MAC")
             else:
@@ -185,11 +185,11 @@ class WebServer:
         cherrypy.quickstart(self.Root(), "/", config={
             "/index": {
                 "tools.staticfile.on": True,
-                "tools.staticfile.filename": get_absolute_path("index.html")
+                "tools.staticfile.filename": get_absolute_path("www/index.html")
             },
             "/static": {
                 "tools.staticdir.on": True,
-                "tools.staticdir.dir": get_absolute_path("static")
+                "tools.staticdir.dir": get_absolute_path("www/static")
             },
             "/backgrounds": {
                 "tools.staticdir.on": True,

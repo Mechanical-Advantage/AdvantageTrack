@@ -83,7 +83,8 @@ if __name__ == "__main__":
                       lambda person, event_time: google_interface.add_sign_in(
                           person, False, event_time),
                       lambda person, event_time: google_interface.add_sign_out(
-                          person, False, event_time))
+                          person, False, event_time),
+                      lambda person, mac: google_interface.update_device_last_seen(person, mac))
     # Start components
     google_interface.start()
     web_server.start()

@@ -141,7 +141,7 @@ class GoogleInterface:
                 for i, row in enumerate(raw_data):
                     key = self._CONFIG_KEYS[i]
                     value = row[0]
-                    if key == "ping_cycle_delay" or key == "ping_timeout" or key == "ping_backoff_length":
+                    if key == "ping_cycle_delay" or key == "ping_timeout" or key == "ping_backoff_length" or key == "monitor_grace_period" or key == "monitor_threshold" or key == "monitor_extension":
                         value = float(value)
                     config["general"][key] = value
 

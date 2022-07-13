@@ -1,5 +1,7 @@
+import datetime
 import subprocess
 import threading
+from turtle import update
 from unittest import skip
 
 from charset_normalizer import detect
@@ -12,9 +14,10 @@ class Monitor:
     '''Manages automatic sign-ins and sign-outs by scanning the local network for registered devices'''
 
     _connection_status = ConnectionStatus.DISCONNECTED
-    _last_pings = {}
+    _last_seen_ips = {}
+    _last_seen_people = {}
 
-    def __init__(self, get_config, get_data, status_callback, sign_in_callback, sign_out_callback):
+    def __init__(self, get_config, get_data, status_callback, sign_in_callback, sign_out_callback, update_last_seen_callback):
         '''
         Creates a new Monitor.
 
@@ -24,6 +27,7 @@ class Monitor:
             status_callback: A function that takes a single ConnectionStatus argument.
             sign_in_callback: A function that accepts a person ID and timestamp.
             sign_out_callback: A function that accepts a person ID and timestamp.
+            update_last_seen_callback: A funcation that accepts a person ID and MAC address.
         '''
 
         self._get_config = get_config
@@ -31,6 +35,7 @@ class Monitor:
         self._status_callback = status_callback
         self._sign_in_callback = sign_in_callback
         self._sign_out_callback = sign_out_callback
+        self._update_last_seen_callback = update_last_seen_callback
 
     def _set_connection_status(self, status):
         '''Sets the current connection status and updates it externally if necessary.'''
@@ -58,8 +63,8 @@ class Monitor:
                 # Determine IP addresses to remove
                 skipped_ips = []
                 for ip_address in all_ips:
-                    if ip_address in self._last_pings.keys():
-                        if current_time - self._last_pings[ip_address] < config["general"]["ping_backoff_length"]:
+                    if ip_address in self._last_seen_ips.keys():
+                        if current_time - self._last_seen_ips[ip_address] < config["general"]["ping_backoff_length"]:
                             skipped_ips.append(ip_address)
 
                 # Run flood ping
@@ -73,7 +78,8 @@ class Monitor:
                 fping_lines = stderr.decode("utf-8").split("\n")[:-1]
 
                 # Find successful detections
-                detected_macs = []
+                detected_macs = set()
+                detected_people = set()
                 for line in fping_lines:
                     line_split = line.split(" : ")
                     ip_address = line_split[0].rstrip()
@@ -82,8 +88,13 @@ class Monitor:
                     if success:
                         mac_address = get_mac_address(ip_address)
                         if mac_address != None:
-                            self._last_pings[ip_address] = current_time
-                            detected_macs.append(mac_address)
+                            self._last_seen_ips[ip_address] = current_time
+                            detected_macs.add(mac_address)
+
+                            for device in data["devices"]:
+                                if device["mac"] == mac_address:
+                                    detected_people.add(device["person"])
+
                             log("Found device \"" + mac_address +
                                 "\" at \"" + ip_address + "\"")
 
@@ -93,6 +104,49 @@ class Monitor:
                     self._set_connection_status(ConnectionStatus.WARNING)
                 else:
                     self._set_connection_status(ConnectionStatus.CONNECTED)
+
+                # Update last seen time for Google
+                for device in data["devices"]:
+                    if device["mac"] in detected_macs:
+                        if device["last_seen"] == None or datetime.datetime.fromtimestamp(device["last_seen"]).date() != datetime.datetime.today().date():
+                            self._update_last_seen_callback(
+                                device["person"], device["mac"])
+
+                # Update local list based on active visits from Google
+                active_people_google = [
+                    x["person"] for x in data["records"] if x["end_time"] == None and not x["start_manual"]]
+                for person in active_people_google:  # Add new people
+                    if person not in self._last_seen_people.keys():
+                        self._last_seen_people[person] = current_time
+                last_seen_people_keys = list(
+                    self._last_seen_people.keys()).copy()
+                for person in last_seen_people_keys:  # Remove old people
+                    if person not in active_people_google:
+                        del self._last_seen_people[person]
+
+                # Sign in / update last seen times based on detected people
+                for person in detected_people:
+                    if person in self._last_seen_people.keys():  # Already signed in, update time
+                        self._last_seen_people[person] = current_time
+
+                    else:  # Not signed in, check for manual grace
+                        last_manual_sign_out = None
+                        for record in data["records"]:
+                            if record["person"] == person and record["end_time"] != None and record["end_manual"]:
+                                last_manual_sign_out = record["end_time"]
+                                break
+
+                        if last_manual_sign_out == None or current_time - last_manual_sign_out > (config["general"]["monitor_grace_period"] * 60):
+                            # Not in manual grace, sign in
+                            self._sign_in_callback(person, current_time)
+                            self._last_seen_people[person] = current_time
+
+                # Sign out anyone who hasn't been seen recently
+                for person, last_seen in self._last_seen_people.items():
+                    if current_time - last_seen > (config["general"]["monitor_threshold"] * 60):
+                        # Don't remove from local cache, so the request is repeated if it fails
+                        self._sign_out_callback(
+                            person, last_seen + (config["general"]["monitor_extension"] * 60))
 
             except:
                 log("Unknown error during monitor cycle")

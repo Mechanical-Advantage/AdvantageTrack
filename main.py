@@ -11,6 +11,7 @@ from web_server import WebServer
 CRED_FILE_PATH = "google_credentials.json"
 SPREADSHEET_ID = "1eskt0XRDJ1SXpOBCr0fZ0JfxVvGlAnGfaVP7qLbpLMY"
 CONFIG_CACHE_FILENAME = "config_cache.json"
+ENABLE_MONITOR = True
 
 # Global variables
 config_cache = {"general": {}, "people": []}
@@ -88,7 +89,8 @@ if __name__ == "__main__":
     # Start components
     google_interface.start()
     web_server.start()
-    monitor.start()
+    if ENABLE_MONITOR:
+        monitor.start()
 
     # Loop forever
     while True:

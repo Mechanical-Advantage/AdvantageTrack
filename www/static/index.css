@@ -386,7 +386,7 @@ div.popup-menu div.manage-devices-details > div:nth-child(5) > div > span {
 #sidebarBackground {
     z-index: 2;
     background-color: white;
-    opacity: 60%;
+    opacity: 80%;
 }
 
 #blurredBackgroundDiv {
@@ -402,7 +402,7 @@ div.popup-menu div.manage-devices-details > div:nth-child(5) > div > span {
     top: 0px;
     width: 100%;
     height: 100%;
-    filter: blur(10px);
+    filter: blur(15px);
 }
 
 #backgroundCanvas {

@@ -46,7 +46,6 @@ class Monitor:
     def _run(self):
         '''Main thread for scanning the network and triggering sign-ins and sign-outs.'''
         while True:
-            time.sleep(self._get_config()["general"]["ping_cycle_delay"])
             current_time = round(time.time())
             config = self._get_config()
             data = self._get_data()
@@ -151,6 +150,8 @@ class Monitor:
             except:
                 log("Unknown error during monitor cycle")
                 self._set_connection_status(ConnectionStatus.DISCONNECTED)
+
+            time.sleep(self._get_config()["general"]["ping_cycle_delay"])
 
     def start(self):
         '''Starts the monitor thread.'''

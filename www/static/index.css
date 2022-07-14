@@ -228,7 +228,7 @@ div.status-lights div.connected {
 div.popup-menu {
     position: absolute;
     z-index: 6;
-    left: calc(40% + 40px);
+    left: calc(min(40%, 700px) + 40px);
     top: 40px;
     right: 40px;
     bottom: 40px;

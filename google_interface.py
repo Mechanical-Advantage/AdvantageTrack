@@ -151,7 +151,10 @@ class GoogleInterface:
                     "C2:C" + str(len(self._CONFIG_KEYS) + 1))
                 for i, row in enumerate(raw_data):
                     key = self._CONFIG_KEYS[i]
-                    value = row[0]
+                    if len(row) > 0:
+                        value = row[0]
+                    else:
+                        value = None
                     if key == "ping_cycle_delay" or key == "ping_timeout" or key == "ping_backoff_length" or key == "monitor_grace_period" or key == "monitor_threshold" or key == "monitor_extension":
                         value = float(value)
                     config["general"][key] = value
@@ -462,7 +465,7 @@ class GoogleInterface:
 
             if next_update in self._CONFIG_CACHE_TIMES:
                 config = self._update_config()
-                if config != None and "background_folder" in config["general"]:
+                if config != None and "background_folder" in config["general"] and config["general"]["background_folder"] != None:
                     self._update_backgrounds(
                         config["general"]["background_folder"])
 
@@ -472,7 +475,7 @@ class GoogleInterface:
     def start(self):
         '''Updates the config and data immediately, then starts the caching thread.'''
         config = self._update_config()
-        if config != None and "background_folder" in config["general"]:
+        if config != None and "background_folder" in config["general"] and config["general"]["background_folder"] != None:
             self._update_backgrounds(config["general"]["background_folder"])
         self._update_data()
 

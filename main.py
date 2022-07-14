@@ -9,7 +9,7 @@ from web_server import WebServer
 
 # Config
 SPREADSHEET_ID = "1eskt0XRDJ1SXpOBCr0fZ0JfxVvGlAnGfaVP7qLbpLMY"
-ENABLE_MONITOR = False
+ENABLE_MONITOR = True
 
 # Cache paths
 DATA_FOLDER = "data"

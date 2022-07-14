@@ -16,6 +16,7 @@ div.sidebar,
     left: 0px;
     top: 0px;
     width: 40%;
+    max-width: 700px;
     height: 100%;
 }
 

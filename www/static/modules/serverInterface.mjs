@@ -45,7 +45,7 @@ export class ServerInterface {
         var query = message["query"];
         var data = message["data"];
 
-        console.log('Received message "' + query + '"');
+        console.log('Received message "' + query + '"', data);
 
         switch (query) {
             case "monitor_status":
@@ -68,6 +68,9 @@ export class ServerInterface {
                 window.dataCache = data;
                 document.dispatchEvent(new Event("dataupdate"));
                 break;
+            case "backgrounds":
+                window.backgroundList = data;
+                document.dispatchEvent(new Event("backgroundupdate"));
         }
     }
 

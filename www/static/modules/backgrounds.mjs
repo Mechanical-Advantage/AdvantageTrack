@@ -3,7 +3,7 @@ export class Backgrounds {
     // Elements
     #canvas = document.getElementById("backgroundCanvas");
     #blurredCanvas = document.getElementById("blurredBackgroundCanvas");
-    #images = Array.from(document.getElementById("backgroundImages").children);
+    #imagesContainer = document.getElementById("backgroundImages");
 
     // Constants
     #scrollRate = 0.1;
@@ -14,10 +14,23 @@ export class Backgrounds {
             window.requestAnimationFrame(periodic);
         };
         window.requestAnimationFrame(periodic);
+
+        document.addEventListener("backgroundupdate", () => {
+            while (this.#imagesContainer.firstChild) {
+                this.#imagesContainer.removeChild(this.#imagesContainer.firstChild);
+            }
+            window.backgroundList.forEach((background) => {
+                var image = document.createElement("img");
+                image.src = "/backgrounds/" + background;
+                this.#imagesContainer.appendChild(image);
+            });
+        });
     }
 
     /** Redraw the canvas. */
     #updateCanvas() {
+        const images = Array.from(this.#imagesContainer.children);
+
         // Initialize canvases
         const devicePixelRatio = window.devicePixelRatio;
         var context = this.#canvas.getContext("2d");
@@ -38,17 +51,20 @@ export class Backgrounds {
 
         // Check if all images are loaded
         var allLoaded = true;
-        this.#images.forEach((image) => {
+        images.forEach((image) => {
             if (!image.complete || image.naturalHeight == 0) {
                 allLoaded = false;
             }
         });
+        if (images.length == 0) {
+            allLoaded = false;
+        }
         if (!allLoaded) {
             return;
         }
 
         // Calculate pixel offset
-        var totalWidthRelative = this.#images.reduce((width, image) => width + image.width / image.height, 0);
+        var totalWidthRelative = images.reduce((width, image) => width + image.width / image.height, 0);
         var wrapPeriod = totalWidthRelative / this.#scrollRate;
         var timeWrapped = (new Date().getTime() / 1000) % wrapPeriod;
         var positionRelative = (timeWrapped / wrapPeriod) * totalWidthRelative;
@@ -64,10 +80,10 @@ export class Backgrounds {
         }
 
         // Render images
-        var adjustedWidths = this.#images.map((image) => (image.width / image.height) * canvasHeight);
+        var adjustedWidths = images.map((image) => (image.width / image.height) * canvasHeight);
         var duplicates = Math.ceil(canvasWidth / adjustedWidths.reduce((a, b) => a + b, 0));
         adjustedWidths = addDuplicates(adjustedWidths, duplicates);
-        addDuplicates(this.#images, duplicates).forEach((image, index) => {
+        addDuplicates(images, duplicates).forEach((image, index) => {
             var startX = adjustedWidths.slice(0, index).reduce((a, b) => a + b, 0) - pixelOffset;
             if (startX > canvasWidth || startX + adjustedWidths[index] < 0) {
                 // Not visible

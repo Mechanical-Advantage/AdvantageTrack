@@ -1,4 +1,5 @@
 import json
+import random
 import threading
 
 import cherrypy
@@ -22,11 +23,13 @@ class WebServer:
     _ip_address = "127.0.0.1"
     _auto_add_person = None
 
-    def __init__(self, get_config, get_data, sign_in_callback, sign_out_callback, add_device_callback, remove_device_callback):
+    def __init__(self, data_folder, background_cache_folder, get_config, get_data, sign_in_callback, sign_out_callback, add_device_callback, remove_device_callback):
         '''
         Creates a new WebServer.
 
         Parameters:
+            data_folder: The name of the local folder where data is stored.
+            background_cache_folder: The name of the local folder to store backgrounds.
             get_config: A function that returns the current config cache.
             get_data: A function that returns the current data cache.
             sign_in_callback: A function that accepts a person ID.
@@ -35,6 +38,8 @@ class WebServer:
             remove_device_callback: A function that accepts a person ID and MAC address.
         '''
 
+        self._DATA_FOLDER = data_folder
+        self._BACKGROUND_CACHE_FOLDER = background_cache_folder
         self._get_config = get_config
         self._get_data = get_data
         self._sign_in_callback = sign_in_callback
@@ -113,6 +118,7 @@ class WebServer:
             self.send(TextMessage(self._parent._generate_message("add_address")))
             self.send(TextMessage(self._parent._generate_message("config")))
             self.send(TextMessage(self._parent._generate_message("data")))
+            self.send(TextMessage(self._parent._generate_message("backgrounds")))
 
         def closed(self, code, _):
             log("WebSocket connection closed (" + str(code) + ")",
@@ -150,6 +156,11 @@ class WebServer:
                     "manual": x["start_manual"]
                 } for x in data_cache["records"] if x["end_time"] == None]
             }
+        elif query == "backgrounds":
+            data = os.listdir(get_absolute_path(
+                self._DATA_FOLDER, self._BACKGROUND_CACHE_FOLDER))
+            data = [x for x in data if x[0] != "."]
+            random.shuffle(data)
         return json.dumps({
             "query": query,
             "data": data
@@ -173,9 +184,14 @@ class WebServer:
                                 TextMessage(self._generate_message("config")))
 
     def new_data(self):
-        '''Tells cls server that the data cache was updated.'''
+        '''Tells the server that the data cache was updated.'''
         cherrypy.engine.publish("websocket-broadcast",
                                 TextMessage(self._generate_message("data")))
+
+    def new_backgrounds(self):
+        '''Tells the server that a new set of backgrounds is available.'''
+        cherrypy.engine.publish("websocket-broadcast",
+                                TextMessage(self._generate_message("backgrounds")))
 
     def _run_server(self):
         '''Starts the server and runs forever.'''
@@ -196,7 +212,7 @@ class WebServer:
             },
             "/backgrounds": {
                 "tools.staticdir.on": True,
-                "tools.staticdir.dir": get_absolute_path("backgrounds")
+                "tools.staticdir.dir": get_absolute_path(self._DATA_FOLDER, self._BACKGROUND_CACHE_FOLDER)
             },
             "/ws": {
                 "tools.websocket.on": True,

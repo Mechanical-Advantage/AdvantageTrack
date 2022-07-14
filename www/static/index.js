@@ -1,7 +1,7 @@
-import { ServerInterface } from "./modules/serverInterface.mjs";
 import { Backgrounds } from "./modules/backgrounds.mjs";
 import { HereNow } from "./modules/hereNow.mjs";
 import { PopupMenu } from "./modules/popupMenu.mjs";
+import { ServerInterface } from "./modules/serverInterface.mjs";
 
 const welcomeMessageHeightPercentageTarget = 15;
 
@@ -21,6 +21,7 @@ window.googleStatus = 0;
 window.configCache = { welcome_message: "", people: [] };
 window.dataCache = { devices: [], here_now: [] };
 window.addAddress = "http://127.0.0.1:8000/add";
+window.backgroundList = [];
 
 /** Updates the status lights based on the current status codes. */
 function updateStatusLights() {

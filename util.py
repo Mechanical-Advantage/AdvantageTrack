@@ -1,3 +1,4 @@
+from ntpath import join
 import os
 import time
 from enum import Enum
@@ -13,9 +14,12 @@ def log(output, before_text=""):
               time.strftime(" - - [%d/%b/%Y:%H:%M:%S] ") + output)
 
 
-def get_absolute_path(relative_path):
+def get_absolute_path(*path):
     '''Returns the absolute path based on a path relative to this folder.'''
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), relative_path))
+    joined_path = os.path.dirname(__file__)
+    for item in path:
+        joined_path = os.path.join(joined_path, item)
+    return os.path.abspath(joined_path)
 
 
 class ConnectionStatus(Enum):

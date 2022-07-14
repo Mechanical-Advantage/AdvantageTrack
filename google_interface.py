@@ -1,12 +1,16 @@
+import datetime
+import io
 import json
+import os
 import threading
 import time
-import datetime
 from enum import Enum
 
 import gspread
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
+from PIL import Image
 
 from util import *
 
@@ -32,13 +36,14 @@ class SheetType(Enum):
 class GoogleInterface:
     '''Connects to Google Drive and Google Sheets to read and write data.'''
 
-    _SCOPES = ["https://www.googleapis.com/auth/drive",
+    _SCOPES = ["https://www.googleapis.com/auth/drive.readonly",
                "https://spreadsheets.google.com/feeds"]
     _CONFIG_KEYS = ["welcome_message", "background_folder", "ip_range_start", "ip_range_end", "ping_cycle_delay",
                     "ping_timeout", "ping_backoff_length", "monitor_grace_period", "monitor_threshold", "monitor_extension"]
     _RECENT_RECORDS = 500  # Number of records to retrieve
     _CONFIG_CACHE_TIMES = [30, 60]
     _DATA_CACHE_TIMES = [10, 20, 30, 40, 50, 60]
+    _BACKGROUND_HEIGHT = 1200  # Backgrounds are downscaled for fast loading
 
     _connection_status = ConnectionStatus.DISCONNECTED
     _creds = None
@@ -47,23 +52,29 @@ class GoogleInterface:
     _gspread_sheets = {}
     _gdrive_client = None
 
-    def __init__(self, cred_file_path, spreadsheet_id, status_callback, config_callback, data_callback):
+    def __init__(self, data_folder, cred_file_path, background_cache_folder, spreadsheet_id, status_callback, config_callback, data_callback, backgrounds_callback):
         '''
         Creates a new GoogleInterface.
 
         Parameters:
-            cred_file_path: The path to the local JSON file with Google credientials.
+            data_folder: The name of the local folder where data is stored.
+            cred_file_path: The name of the local JSON file with Google credientials.
+            background_cache_folder: The name of the local folder to store backgrounds.
             spreadsheet_id: The ID of the main spreadsheet on Google Drive.
             status_callback: A function that takes a single ConnectionStatus argument.
             config_callback: A function that accepts a single argument for config data.
             data_callback: A function that accepts a single argument for general data.
+            backgrounds_callback: A function that is called when the set of backgrounds changes.
         '''
 
+        self._DATA_FOLDER = data_folder
         self._CRED_FILE_PATH = cred_file_path
+        self._BACKGROUND_CACHE_FOLDER = background_cache_folder
         self._SPREADSHEET_ID = spreadsheet_id
         self._status_callback = status_callback
         self._config_callback = config_callback
         self._data_callback = data_callback
+        self._backgrounds_callback = backgrounds_callback
 
     def _set_connection_status(self, status):
         '''Sets the current connection status and updates it externally if necessary.'''
@@ -83,7 +94,7 @@ class GoogleInterface:
         # Authenticate to Google
         try:
             self._creds = Credentials.from_service_account_info(
-                json.load(open(self._CRED_FILE_PATH)), scopes=self._SCOPES)
+                json.load(open(get_absolute_path(self._DATA_FOLDER, self._CRED_FILE_PATH))), scopes=self._SCOPES)
             self._gspread_client = gspread.authorize(self._creds)
             self._gdrive_client = build(
                 "drive", "v3", credentials=self._creds)
@@ -379,6 +390,68 @@ class GoogleInterface:
             self._update_data()
             return True
 
+    def _update_backgrounds(self, folder_id):
+        '''Syncs the local cache of backgrounds to Google Drive.'''
+        if not self._auth():
+            return False
+
+        changed = False
+        try:
+            # Get list from local cache
+            local_images = os.listdir(get_absolute_path(
+                self._DATA_FOLDER, self._BACKGROUND_CACHE_FOLDER))
+            local_images = [x for x in local_images if x[0] != "."]
+
+            # Get list from Google
+            raw_data = self._gdrive_client.files().list(
+                q="'" + folder_id + "' in parents and (mimeType = 'image/jpeg' or mimeType = 'image/png')").execute()["files"]
+            google_images = []
+            for google_image in raw_data:
+                google_images.append(google_image["id"] + "." +
+                                     google_image["mimeType"].split("/")[1])
+
+            # Delete old images
+            for image in local_images:
+                if image not in google_images:
+                    changed = True
+                    os.remove(get_absolute_path(self._DATA_FOLDER,
+                                                self._BACKGROUND_CACHE_FOLDER, image))
+                    log("Deleted background \"" + image + "\"")
+
+            # Download new images
+            for image in google_images:
+                if image not in local_images:
+                    changed = True
+
+                    # Download data
+                    request = self._gdrive_client.files().get_media(
+                        fileId=image.split(".")[0])
+                    image_data = io.BytesIO()
+                    downloader = MediaIoBaseDownload(image_data, request)
+                    done = False
+                    while not done:
+                        _, done = downloader.next_chunk()
+
+                    # Downscale image
+                    image_data.seek(0)
+                    pillow_image = Image.open(image_data)
+                    aspect_ratio = pillow_image.width / pillow_image.height
+                    new_width = round(aspect_ratio * self._BACKGROUND_HEIGHT)
+                    pillow_image = pillow_image.resize(
+                        (new_width, self._BACKGROUND_HEIGHT))
+                    pillow_image.save(get_absolute_path(self._DATA_FOLDER,
+                                                        self._BACKGROUND_CACHE_FOLDER, image))
+                    log("Downloaded background \"" + image + "\"")
+
+        except:
+            log("Failed to sync backgrounds with Google")
+            self._set_connection_status(ConnectionStatus.WARNING)
+            return False
+        else:
+            if changed:
+                self._backgrounds_callback()
+            return True
+
     def _cache_thread(self):
         '''Thread to regularly update config and data.'''
         while True:
@@ -388,14 +461,19 @@ class GoogleInterface:
             time.sleep(next_update - current_secs)
 
             if next_update in self._CONFIG_CACHE_TIMES:
-                self._update_config()
+                config = self._update_config()
+                if config != None and "background_folder" in config["general"]:
+                    self._update_backgrounds(
+                        config["general"]["background_folder"])
 
             if next_update in self._DATA_CACHE_TIMES:
                 self._update_data()
 
     def start(self):
         '''Updates the config and data immediately, then starts the caching thread.'''
-        self._update_config()
+        config = self._update_config()
+        if config != None and "background_folder" in config["general"]:
+            self._update_backgrounds(config["general"]["background_folder"])
         self._update_data()
 
         threading.Thread(target=self._cache_thread, daemon=True).start()

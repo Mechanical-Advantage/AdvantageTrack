@@ -38,7 +38,11 @@ body.SUCCESS .show-success {
     display: block;
 }
 
-body.FAILURE-MAC .show-failure-mac {
+body.FAILURE-GETMAC .show-failure-getmac {
+    display: block;
+}
+
+body.FAILURE-RANDOM .show-failure-random {
     display: block;
 }
 

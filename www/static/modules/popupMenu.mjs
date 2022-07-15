@@ -27,7 +27,6 @@ export class PopupMenu {
     #slideTransition = "transform 0.3s";
     #peopleColumns = 4;
     #thanksTimeoutLengthMs = 3000;
-    #randomMacRegex = new RegExp("^.[26ae]");
 
     // Variables
     #state = -1; // -1 = hidden, 0 = sign in people, 1 = sign in thanks, 2 = manage devices people, 3 = manage devices details
@@ -218,13 +217,6 @@ export class PopupMenu {
             .sort((a, b) => {
                 return a["last_seen"] < b["last_seen"];
             });
-        const randomCount = devices.reduce((count, device) => {
-            if (this.#randomMacRegex.test(device["mac"])) {
-                return count + 1;
-            } else {
-                return count;
-            }
-        }, 0);
 
         // Update list title
         if (devices.length == 0) {
@@ -242,10 +234,6 @@ export class PopupMenu {
         devices.forEach((device) => {
             var div = document.createElement("div");
             this.#deviceDetailsList.appendChild(div);
-            var macSuffix = randomCount > 0 ? " " : "";
-            if (this.#randomMacRegex.test(device["mac"])) {
-                macSuffix = "*";
-            }
             var lastSeen = "XX/XX/XX";
             if (device["last_seen"] != null) {
                 lastSeen = new Date(device["last_seen"] * 1000).toLocaleDateString("en-US", {
@@ -254,7 +242,7 @@ export class PopupMenu {
                     year: "2-digit"
                 });
             }
-            div.innerHTML = device["mac"] + macSuffix + " - " + lastSeen + " (<span>Remove</span>)";
+            div.innerHTML = device["mac"] + " - " + lastSeen + " (<span>Remove</span>)";
             div.firstElementChild.addEventListener("click", () => {
                 document.dispatchEvent(
                     new CustomEvent("sendremovedevice", {

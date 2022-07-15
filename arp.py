@@ -4,6 +4,7 @@ import subprocess
 
 
 valid_mac_address_pattern = re.compile(r"^([0-9a-f]{2}[:]){5}([0-9a-f]{2})$")
+random_mac_address_pattern = re.compile(r"^.[26ae]")
 
 
 def get_mac_address(ip_address):

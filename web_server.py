@@ -8,7 +8,7 @@ from ws4py.messaging import TextMessage
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 
-from arp import get_mac_address
+from arp import *
 from util import *
 
 
@@ -65,17 +65,22 @@ class WebServer:
         def add(self):
             # Register device
             mac_address = get_mac_address(cherrypy.request.remote.ip)
-            if mac_address != None and self._parent._auto_add_person != None:
-                google_success = self._parent._add_device_callback(
-                    self._parent._auto_add_person, mac_address)
+            if mac_address != None:
+                is_random = random_mac_address_pattern.match(
+                    mac_address) != None
+                if self._parent._auto_add_person != None and not is_random:
+                    google_success = self._parent._add_device_callback(
+                        self._parent._auto_add_person, mac_address)
 
             # Create response
             html = open(get_absolute_path("www/add.html")).read()
             if mac_address == None:
-                html = html.replace("$(RESULT)", "FAILURE-MAC")
+                html = html.replace("$(RESULT)", "FAILURE-GETMAC")
             else:
                 html = html.replace("$(MAC)", mac_address)
-                if self._parent._auto_add_person == None:
+                if is_random:
+                    html = html.replace("$(RESULT)", "FAILURE-RANDOM")
+                elif self._parent._auto_add_person == None:
                     html = html.replace("$(RESULT)", "FAILURE-PERSON")
                 elif not google_success:
                     html = html.replace("$(RESULT)", "FAILURE-GOOGLE")

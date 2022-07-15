@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
         <link rel="stylesheet" href="/static/add.css" />
@@ -10,11 +11,18 @@
     <body class="$(RESULT)">
         <div class="centered">
             <div class="title show-success" hidden>Success!</div>
-            <div class="title show-failure-mac show-failure-person show-failure-google" hidden>Error</div>
+            <div class="title show-failure-getmac show-failure-random show-failure-person show-failure-google" hidden>
+                Error
+            </div>
             <div class="message show-success" hidden>
                 This device has been registered with the following MAC address:
             </div>
-            <div class="message show-failure-mac" hidden>There was a problem retrieving this device's MAC address.</div>
+            <div class="message show-failure-getmac" hidden>
+                There was a problem retrieving this device's MAC address.
+            </div>
+            <div class="message show-failure-random" hidden>
+                This device is using the following random MAC address. Please repeat step two and refresh the page.
+            </div>
             <div class="message show-failure-person" hidden>
                 This device has the following MAC address, but we don't know who you are. Please refresh the main
                 dashboard and try again.
@@ -22,7 +30,9 @@
             <div class="message show-failure-google" hidden>
                 This device has the following MAC address, but there was a problem registering it with Google:
             </div>
-            <div class="mac-address show-success show-failure-person show-failure-google" hidden>$(MAC)</div>
+            <div class="mac-address show-success show-failure-random show-failure-person show-failure-google" hidden>
+                $(MAC)
+            </div>
         </div>
     </body>
 </html>

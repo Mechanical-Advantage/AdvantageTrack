@@ -4,11 +4,10 @@ AdvantageTrack is an attendance system built to combine a manual sign-in interfa
 
 The local server can run on Linux, Windows, or macOS. No special hardware or network access is required for automatic monitoring. The frequency of flood pings is configurable, though it requires a network where ICMP echo requests are allowed. Both [iOS](https://support.apple.com/HT211227) and [Android](https://source.android.com/devices/tech/connect/wifi-mac-randomization-behavior) currently use randomized MAC addresses by default, but the system will guide users through disabling this feature _for a single network_ (meaning there is no impact to device security on other networks). This step is required because both operating systems will reset the MAC address used on a network under some conditions.
 
-<details>
-
-<summary>Screenshots</summary>
-
 ![Screenshot #1](screenshots/img-1.png)
+
+<details>
+<summary>More Screenshots</summary>
 
 ![Screenshot #2](screenshots/img-2.png)
 

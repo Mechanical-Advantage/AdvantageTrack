@@ -11,7 +11,7 @@ from util import *
 
 
 class Monitor:
-    """Manages automatic sign-ins and sign-outs by scanning the local network for registered devices"""
+    """Manages automatic sign-ins and sign-outs by scanning the local network for registered devices."""
 
     _connection_status = ConnectionStatus.DISCONNECTED
     _last_seen_ips = {}
@@ -63,7 +63,7 @@ class Monitor:
                 skipped_ips = []
                 for ip_address in all_ips:
                     if ip_address in self._last_seen_ips.keys():
-                        if current_time - self._last_seen_ips[ip_address] < config["general"]["ping_backoff_length"]:
+                        if current_time - self._last_seen_ips[ip_address] < config["general"]["ping_backoff_length_secs"]:
                             skipped_ips.append(ip_address)
 
                 # Run flood ping
@@ -71,7 +71,7 @@ class Monitor:
                     " skipped IP address" + ("" if len(skipped_ips) == 1 else "es"))
                 ping_list = [x for x in all_ips if x not in skipped_ips]
                 fping = subprocess.Popen(
-                    ["fping", "-C", "1", "-r", "0", "-t", str(config["general"]["ping_timeout"] * 1000), "-q"] + ping_list, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                    ["fping", "-C", "1", "-r", "0", "-t", str(config["general"]["ping_timeout_secs"] * 1000), "-q"] + ping_list, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
                 fping.wait()
                 _, stderr = fping.communicate()
                 fping_lines = stderr.decode("utf-8").split("\n")[:-1]
@@ -135,23 +135,31 @@ class Monitor:
                                 last_manual_sign_out = record["end_time"]
                                 break
 
-                        if last_manual_sign_out == None or current_time - last_manual_sign_out > (config["general"]["monitor_grace_period"] * 60):
+                        if last_manual_sign_out == None or current_time - last_manual_sign_out > (config["general"]["auto_grace_period_mins"] * 60):
                             # Not in manual grace, sign in
                             self._sign_in_callback(person, current_time)
                             self._last_seen_people[person] = current_time
 
                 # Sign out anyone who hasn't been seen recently
                 for person, last_seen in self._last_seen_people.items():
-                    if current_time - last_seen > (config["general"]["monitor_threshold"] * 60):
+                    if current_time - last_seen > (config["general"]["auto_timeout_mins"] * 60):
                         # Don't remove from local cache, so the request is repeated if it fails
                         self._sign_out_callback(
-                            person, last_seen + (config["general"]["monitor_extension"] * 60))
+                            person, last_seen + (config["general"]["auto_extension_mins"] * 60))
+
+                # Trigger manual timeouts
+                manual_timeouts = [x for x in data["records"] if x["start_manual"] and current_time -
+                                   x["start_time"] > config["general"]["manual_timeout_hours"] * 3600]
+                for record in manual_timeouts:
+                    self._sign_out_callback(
+                        record["person"], record["start_time"] + (config["general"]["manual_extension_hours"] * 3600))
 
             except:
                 log("Unknown error during monitor cycle")
                 self._set_connection_status(ConnectionStatus.DISCONNECTED)
 
-            time.sleep(self._get_config()["general"]["ping_cycle_delay"])
+            time.sleep(self._get_config()["general"]
+                       ["ping_cycle_delay_secs"])
 
     def start(self):
         """Starts the monitor thread."""

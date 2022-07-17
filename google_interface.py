@@ -40,8 +40,9 @@ class GoogleInterface:
 
     _SCOPES = ["https://www.googleapis.com/auth/drive.readonly",
                "https://spreadsheets.google.com/feeds"]
-    _CONFIG_KEYS = ["welcome_message", "background_folder", "ip_range_start", "ip_range_end", "ping_cycle_delay",
-                    "ping_timeout", "ping_backoff_length", "monitor_grace_period", "monitor_threshold", "monitor_extension"]
+    _CONFIG_KEYS = ["welcome_message", "background_folder", "ip_range_start", "ip_range_end", "ping_cycle_delay_secs",
+                    "ping_timeout_secs", "ping_backoff_length_secs", "auto_grace_period_mins", "auto_timeout_mins",
+                    "auto_extension_mins", "manual_timeout_hours", "manual_extension_hours"]
     _RECENT_RECORDS = 500  # Number of records to retrieve
     _CONFIG_CACHE_TIMES = [30, 60]
     _DATA_CACHE_TIMES = [10, 20, 30, 40, 50, 60]
@@ -159,7 +160,7 @@ class GoogleInterface:
                         value = row[0]
                     else:
                         value = None
-                    if key == "ping_cycle_delay" or key == "ping_timeout" or key == "ping_backoff_length" or key == "monitor_grace_period" or key == "monitor_threshold" or key == "monitor_extension":
+                    if key == "ping_cycle_delay_secs" or key == "ping_timeout_secs" or key == "ping_backoff_length_secs" or key == "auto_grace_period_mins" or key == "auto_timeout_mins" or key == "auto_extension_mins" or key == "manual_timeout_hours" or key == "manual_extension_hours":
                         value = float(value)
                     config["general"][key] = value
 

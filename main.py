@@ -8,7 +8,7 @@ from util import *
 from web_server import WebServer
 
 # Config
-SPREADSHEET_ID = "117g0337Ea0kCxR8ZTk7XVnB71pYxJREl-89_z05zCvQ"
+SPREADSHEET_ID = ""
 ENABLE_MONITOR = True
 
 # Cache paths

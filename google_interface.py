@@ -10,7 +10,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
-from PIL import Image
+from PIL import Image, ImageOps
 
 from util import *
 
@@ -467,6 +467,7 @@ class GoogleInterface:
                     # Downscale image
                     image_data.seek(0)
                     pillow_image = Image.open(image_data)
+                    pillow_image = ImageOps.exif_transpose(pillow_image)
                     aspect_ratio = pillow_image.width / pillow_image.height
                     new_width = round(aspect_ratio * self._BACKGROUND_HEIGHT)
                     pillow_image = pillow_image.resize(

@@ -20,7 +20,7 @@ export class Backgrounds {
                 this.#imagesContainer.removeChild(this.#imagesContainer.firstChild);
             }
             window.backgroundList.forEach((background) => {
-                var image = document.createElement("img");
+                let image = document.createElement("img");
                 image.src = "/backgrounds/" + background;
                 this.#imagesContainer.appendChild(image);
             });

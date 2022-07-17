@@ -44,7 +44,7 @@ export class HereNow {
                 if (index % this.#columns == 0) {
                     this.#tableBody.appendChild(document.createElement("tr"));
                 }
-                var cell = document.createElement("td");
+                let cell = document.createElement("td");
                 cell.innerText = person["name"];
                 if (!person["manual"]) cell.classList.add("auto");
                 cell.addEventListener("click", () => {

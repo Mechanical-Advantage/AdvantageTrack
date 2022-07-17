@@ -126,15 +126,15 @@ export class PopupMenu {
             [signInPeople, this.#signInPeopleTableBody, true],
             [allPeople, this.#devicesPeopleTableBody, false]
         ).forEach((entry) => {
-            var peopleList = entry[0];
-            var tableBody = entry[1];
-            var isSignIn = entry[2];
+            let peopleList = entry[0];
+            let tableBody = entry[1];
+            let isSignIn = entry[2];
 
             peopleList.forEach((person, index) => {
                 if (index % this.#peopleColumns == 0) {
                     tableBody.appendChild(document.createElement("tr"));
                 }
-                var cell = document.createElement("td");
+                let cell = document.createElement("td");
                 cell.innerText = person["name"];
                 if (!person["manual"]) cell.classList.add("auto");
                 cell.addEventListener("click", () => {
@@ -232,9 +232,9 @@ export class PopupMenu {
             this.#deviceDetailsList.removeChild(this.#deviceDetailsList.firstChild);
         }
         devices.forEach((device) => {
-            var div = document.createElement("div");
+            let div = document.createElement("div");
             this.#deviceDetailsList.appendChild(div);
-            var lastSeen = "XX/XX/XX";
+            let lastSeen = "XX/XX/XX";
             if (device["last_seen"] != null) {
                 lastSeen = new Date(device["last_seen"] * 1000).toLocaleDateString("en-US", {
                     month: "2-digit",

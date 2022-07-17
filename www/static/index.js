@@ -21,7 +21,7 @@ window.googleStatus = 0;
 window.configCache = { welcome_message: "", people: [] };
 window.dataCache = { devices: [], here_now: [] };
 window.addAddress = "http://127.0.0.1:8000/add";
-window.backgroundList = [];
+window.backgroundData = [];
 
 /** Updates the status lights based on the current status codes. */
 function updateStatusLights() {

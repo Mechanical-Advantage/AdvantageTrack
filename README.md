@@ -59,7 +59,7 @@ venv\Scripts\activate.bat
 pip install -r requirements.txt
 ```
 
-9. Launch the `main.py` script in the virutal environment and navigate to http://127.0.0.1:8000 in a browser. The status of the system will be displayed at the bottom of the page. If the background folder was linked correctly, the images will appear on this page once the downloads finish.
+9. Launch the `main.py` script in the virutal environment and navigate to http://127.0.0.1:8000 in a browser. The status of the system will be displayed at the bottom of the page. If the background folder was linked correctly, your custom images will appear on this page once the downloads finish (a default set will be used temporarily).
 
 10. If desired, configure the OS to automatically log in, start the `main.py` script, and open a browser.
 

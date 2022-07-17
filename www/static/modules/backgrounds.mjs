@@ -19,9 +19,10 @@ export class Backgrounds {
             while (this.#imagesContainer.firstChild) {
                 this.#imagesContainer.removeChild(this.#imagesContainer.firstChild);
             }
-            window.backgroundList.forEach((background) => {
+            window.backgroundData["files"].forEach((background) => {
                 let image = document.createElement("img");
-                image.src = "/backgrounds/" + background;
+                image.src =
+                    "/backgrounds/" + (window.backgroundData["is_default"] ? "default" : "user") + "/" + background;
                 this.#imagesContainer.appendChild(image);
             });
         });

@@ -69,7 +69,7 @@ export class ServerInterface {
                 document.dispatchEvent(new Event("dataupdate"));
                 break;
             case "backgrounds":
-                window.backgroundList = data;
+                window.backgroundData = data;
                 document.dispatchEvent(new Event("backgroundupdate"));
         }
     }

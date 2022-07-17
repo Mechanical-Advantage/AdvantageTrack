@@ -162,10 +162,21 @@ class WebServer:
                 } for x in data_cache["records"] if x["end_time"] == None]
             }
         elif query == "backgrounds":
-            data = os.listdir(get_absolute_path(
+            is_default = False
+            files = os.listdir(get_absolute_path(
                 self._DATA_FOLDER, self._BACKGROUND_CACHE_FOLDER))
-            data = [x for x in data if x[0] != "."]
-            random.shuffle(data)
+            files = [x for x in files if x[0] != "."]
+            if len(files) == 0:
+                is_default = True
+                files = os.listdir(get_absolute_path(
+                    "default_backgrounds"))
+                files = [x for x in files if x[0] != "."]
+
+            random.shuffle(files)
+            data = {
+                "is_default": is_default,
+                "files": files
+            }
         return json.dumps({
             "query": query,
             "data": data
@@ -215,9 +226,13 @@ class WebServer:
                 "tools.staticdir.on": True,
                 "tools.staticdir.dir": get_absolute_path("www/static")
             },
-            "/backgrounds": {
+            "/backgrounds/user": {
                 "tools.staticdir.on": True,
                 "tools.staticdir.dir": get_absolute_path(self._DATA_FOLDER, self._BACKGROUND_CACHE_FOLDER)
+            },
+            "/backgrounds/default": {
+                "tools.staticdir.on": True,
+                "tools.staticdir.dir": get_absolute_path("default_backgrounds")
             },
             "/ws": {
                 "tools.websocket.on": True,

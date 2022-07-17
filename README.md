@@ -21,7 +21,7 @@ The local server can run on Linux, Windows, or macOS. No special hardware or net
 
 2. In Google Drive, make a copy of [this Google Sheet](https://docs.google.com/spreadsheets/d/1eskt0XRDJ1SXpOBCr0fZ0JfxVvGlAnGfaVP7qLbpLMY/edit?usp=sharing) and create a new folder for background images. Share these items to the service account email from your Google Cloud Project (the folder requires at least view access and the sheet requires at least edit access).
 
-3. Check the configuration in the "Config - General" sheet (hover over each key for a detailed explanation). In particular, make sure to update the IP address range and background folder ID. You can also update the list of registered people in the "Config - People" sheet.
+3. Check the configuration in the "Config - General" sheet (hover over each key for a detailed explanation). In particular, make sure to update the IP address range and background folder ID. You can also update the list of registered people in the "Config - People" sheet. **Note that the some of the sheets include sample rows. Don't delete these rows; they serve as templates.**
 
 4. Add some JPEG or PNG images to the backgrounds folder. These will be automatically downloaded by the server (and updated periodically).
 

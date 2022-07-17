@@ -13,7 +13,7 @@ from util import *
 
 
 class WebServer:
-    '''Manages the CherryPy server (HTTP and WebSocket).'''
+    """Manages the CherryPy server (HTTP and WebSocket)."""
 
     _PORT = 8000
     _IP_MONITOR_PERIOD_SECS = 5
@@ -24,7 +24,7 @@ class WebServer:
     _auto_add_person = None
 
     def __init__(self, data_folder, background_cache_folder, get_config, get_data, sign_in_callback, sign_out_callback, add_device_callback, remove_device_callback):
-        '''
+        """
         Creates a new WebServer.
 
         Parameters:
@@ -36,7 +36,7 @@ class WebServer:
             sign_out_callback: A function that accepts a person ID.
             add_device_callback: A function that accepts a person ID and MAC address.
             remove_device_callback: A function that accepts a person ID and MAC address.
-        '''
+        """
 
         self._DATA_FOLDER = data_folder
         self._BACKGROUND_CACHE_FOLDER = background_cache_folder
@@ -51,7 +51,7 @@ class WebServer:
         self.WebSocketHandler.set_parent(self)
 
     class Root(object):
-        '''CherryPy server for HTTP requests.'''
+        """CherryPy server for HTTP requests."""
 
         @classmethod
         def set_parent(cls, parent):
@@ -89,7 +89,7 @@ class WebServer:
             return html
 
     class WebSocketHandler(WebSocket):
-        '''WebSocket handler for each connection.'''
+        """WebSocket handler for each connection."""
 
         @classmethod
         def set_parent(cls, parent):
@@ -130,7 +130,7 @@ class WebServer:
                 before_text=self.peer_address[0])
 
     def _generate_message(self, query):
-        '''Generates the text message to send for the specified query.'''
+        """Generates the text message to send for the specified query."""
         data = None
         if query == "monitor_status":
             data = self._monitor_status.value
@@ -172,34 +172,34 @@ class WebServer:
         })
 
     def new_monitor_status(self, status):
-        '''Sets the monitor status.'''
+        """Sets the monitor status."""
         self._monitor_status = status
         cherrypy.engine.publish("websocket-broadcast",
                                 TextMessage(self._generate_message("monitor_status")))
 
     def new_google_status(self, status):
-        '''Sets the Google status.'''
+        """Sets the Google status."""
         self._google_status = status
         cherrypy.engine.publish("websocket-broadcast",
                                 TextMessage(self._generate_message("google_status")))
 
     def new_config(self):
-        '''Tells the server that the config cache was updated.'''
+        """Tells the server that the config cache was updated."""
         cherrypy.engine.publish("websocket-broadcast",
                                 TextMessage(self._generate_message("config")))
 
     def new_data(self):
-        '''Tells the server that the data cache was updated.'''
+        """Tells the server that the data cache was updated."""
         cherrypy.engine.publish("websocket-broadcast",
                                 TextMessage(self._generate_message("data")))
 
     def new_backgrounds(self):
-        '''Tells the server that a new set of backgrounds is available.'''
+        """Tells the server that a new set of backgrounds is available."""
         cherrypy.engine.publish("websocket-broadcast",
                                 TextMessage(self._generate_message("backgrounds")))
 
     def _run_server(self):
-        '''Starts the server and runs forever.'''
+        """Starts the server and runs forever."""
 
         WebSocketPlugin(cherrypy.engine).subscribe()
         cherrypy.tools.websocket = WebSocketTool()
@@ -226,7 +226,7 @@ class WebServer:
         })
 
     def _monitor_ip(self):
-        '''Periodically checks the current IP address.'''
+        """Periodically checks the current IP address."""
         while True:
             new_ip_address = "127.0.0.1"
             for interface_name in netifaces.interfaces():
@@ -245,6 +245,6 @@ class WebServer:
             time.sleep(self._IP_MONITOR_PERIOD_SECS)
 
     def start(self):
-        '''Starts the web server and IP address monitor in a separate threads.'''
+        """Starts the web server and IP address monitor in a separate threads."""
         threading.Thread(target=self._run_server, daemon=True).start()
         threading.Thread(target=self._monitor_ip, daemon=True).start()

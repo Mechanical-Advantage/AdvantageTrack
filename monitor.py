@@ -11,14 +11,14 @@ from util import *
 
 
 class Monitor:
-    '''Manages automatic sign-ins and sign-outs by scanning the local network for registered devices'''
+    """Manages automatic sign-ins and sign-outs by scanning the local network for registered devices"""
 
     _connection_status = ConnectionStatus.DISCONNECTED
     _last_seen_ips = {}
     _last_seen_people = {}
 
     def __init__(self, get_config, get_data, status_callback, sign_in_callback, sign_out_callback, update_last_seen_callback):
-        '''
+        """
         Creates a new Monitor.
 
         Parameters:
@@ -28,7 +28,7 @@ class Monitor:
             sign_in_callback: A function that accepts a person ID and timestamp.
             sign_out_callback: A function that accepts a person ID and timestamp.
             update_last_seen_callback: A funcation that accepts a person ID and MAC address.
-        '''
+        """
 
         self._get_config = get_config
         self._get_data = get_data
@@ -38,13 +38,13 @@ class Monitor:
         self._update_last_seen_callback = update_last_seen_callback
 
     def _set_connection_status(self, status):
-        '''Sets the current connection status and updates it externally if necessary.'''
+        """Sets the current connection status and updates it externally if necessary."""
         if status != self._connection_status:
             self._connection_status = status
             self._status_callback(self._connection_status)
 
     def _run(self):
-        '''Main thread for scanning the network and triggering sign-ins and sign-outs.'''
+        """Main thread for scanning the network and triggering sign-ins and sign-outs."""
         while True:
             current_time = round(time.time())
             config = self._get_config()
@@ -154,5 +154,5 @@ class Monitor:
             time.sleep(self._get_config()["general"]["ping_cycle_delay"])
 
     def start(self):
-        '''Starts the monitor thread.'''
+        """Starts the monitor thread."""
         threading.Thread(target=self._run, daemon=True).start()

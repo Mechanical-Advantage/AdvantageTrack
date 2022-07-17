@@ -16,25 +16,27 @@ from util import *
 
 
 class SheetType(Enum):
-    '''The type of data stored on a sheet.'''
+    """The type of data stored on a sheet."""
 
     CONFIG_GENERAL = 1
     CONFIG_PEOPLE = 2
     DATA_DEVICES = 3
     DATA_RECORDS = 4
+    DATA_STATUS = 5
 
     def get_friendly_name(self):
-        '''Returns the expected title of this type of sheet.'''
+        """Returns the expected title of this type of sheet."""
         return {
             __class__.CONFIG_GENERAL: "Config - General",
             __class__.CONFIG_PEOPLE: "Config - People",
             __class__.DATA_DEVICES: "Data - Devices",
-            __class__.DATA_RECORDS: "Data - Records"
+            __class__.DATA_RECORDS: "Data - Records",
+            __class__.DATA_STATUS: "Data - Status"
         }[self]
 
 
 class GoogleInterface:
-    '''Connects to Google Drive and Google Sheets to read and write data.'''
+    """Connects to Google Drive and Google Sheets to read and write data."""
 
     _SCOPES = ["https://www.googleapis.com/auth/drive.readonly",
                "https://spreadsheets.google.com/feeds"]
@@ -43,8 +45,10 @@ class GoogleInterface:
     _RECENT_RECORDS = 500  # Number of records to retrieve
     _CONFIG_CACHE_TIMES = [30, 60]
     _DATA_CACHE_TIMES = [10, 20, 30, 40, 50, 60]
+    _STATUS_UPDATE_TIMES = [60]
     _BACKGROUND_HEIGHT = 1200  # Backgrounds are downscaled for fast loading
 
+    _start_time = round(time.time())
     _connection_status = ConnectionStatus.DISCONNECTED
     _creds = None
     _gspread_client = None
@@ -53,7 +57,7 @@ class GoogleInterface:
     _gdrive_client = None
 
     def __init__(self, data_folder, cred_file_path, background_cache_folder, spreadsheet_id, status_callback, config_callback, data_callback, backgrounds_callback):
-        '''
+        """
         Creates a new GoogleInterface.
 
         Parameters:
@@ -65,7 +69,7 @@ class GoogleInterface:
             config_callback: A function that accepts a single argument for config data.
             data_callback: A function that accepts a single argument for general data.
             backgrounds_callback: A function that is called when the set of backgrounds changes.
-        '''
+        """
 
         self._DATA_FOLDER = data_folder
         self._CRED_FILE_PATH = cred_file_path
@@ -77,13 +81,13 @@ class GoogleInterface:
         self._backgrounds_callback = backgrounds_callback
 
     def _set_connection_status(self, status):
-        '''Sets the current connection status and updates it externally if necessary.'''
+        """Sets the current connection status and updates it externally if necessary."""
         if status != self._connection_status:
             self._connection_status = status
             self._status_callback(self._connection_status)
 
     def _auth(self):
-        '''Connect to Google and reauthorize if necessary. Returns a boolean indicating whether the connection was successful.'''
+        """Connect to Google and reauthorize if necessary. Returns a boolean indicating whether the connection was successful."""
 
         # Check if authentication is required
         if self._connection_status == ConnectionStatus.CONNECTED and self._creds.valid:
@@ -139,7 +143,7 @@ class GoogleInterface:
         return True
 
     def _update_config(self, update_general=True, update_people=True, send_result=True):
-        '''Retrieves the current general config data and people list, sending it to the callback if valid.'''
+        """Retrieves the current general config data and people list, sending it to the callback if valid."""
         if not self._auth():
             return None
 
@@ -184,7 +188,7 @@ class GoogleInterface:
             return config
 
     def _update_data(self, update_devices=True, update_records=True, send_result=True):
-        '''Retrievess a list of registered devices ("devices"), with keys "person", "mac", and "last_seen", and a list of recent records ("records"), with keys "person", "start_time", "end_time", "start_manual", "end_manual". The result is sent to the callback if valid.'''
+        """Retrievess a list of registered devices ("devices"), with keys "person", "mac", and "last_seen", and a list of recent records ("records"), with keys "person", "start_time", "end_time", "start_manual", "end_manual". The result is sent to the callback if valid. This data does not include the status table."""
         if not self._auth():
             return None
 
@@ -225,8 +229,32 @@ class GoogleInterface:
                 self._data_callback(data)
             return data
 
+    def _update_status(self):
+        if not self._auth():
+            return False
+
+        try:
+            # Get last start time
+            sheet = self._gspread_sheets[SheetType.DATA_STATUS]
+            last_start_time = int(sheet.get("A2")[0][0])
+
+            # Add new row / update end time
+            current_time = round(time.time())
+            if last_start_time != self._start_time:
+                sheet.insert_row([self._start_time, current_time], 2)
+            else:
+                sheet.update("B2", [[current_time]])
+
+        except:
+            log("Failed to send status data to Google")
+            self._set_connection_status(ConnectionStatus.WARNING)
+            return False
+        else:
+            log("Sent new status data to Google")
+            return True
+
     def add_sign_in(self, person, is_manual, event_time=None):
-        '''Creates a new visit (or updates an existing visit), then updates the data cache.'''
+        """Creates a new visit (or updates an existing visit), then updates the data cache."""
         if not self._auth():
             return False
 
@@ -261,7 +289,7 @@ class GoogleInterface:
             return True
 
     def add_sign_out(self, person, is_manual, event_time=None):
-        '''Closes all visits for the specified person, then updates the data cache.'''
+        """Closes all visits for the specified person, then updates the data cache."""
         if not self._auth():
             return False
 
@@ -297,7 +325,7 @@ class GoogleInterface:
             return True
 
     def add_device(self, person, mac):
-        '''Registers a new device to the specified person, then updates the data cache.'''
+        """Registers a new device to the specified person, then updates the data cache."""
         if not self._auth():
             return False
 
@@ -330,7 +358,7 @@ class GoogleInterface:
             return True
 
     def remove_device(self, person, mac):
-        '''Removes the specified device, then updates the data cache.'''
+        """Removes the specified device, then updates the data cache."""
         if not self._auth():
             return False
 
@@ -361,7 +389,7 @@ class GoogleInterface:
             return True
 
     def update_device_last_seen(self, person, mac):
-        '''Sets the "last seen" time for the specified device to today, then updates the data cache.'''
+        """Sets the "last seen" time for the specified device to today, then updates the data cache."""
         if not self._auth():
             return False
 
@@ -394,7 +422,7 @@ class GoogleInterface:
             return True
 
     def _update_backgrounds(self, folder_id):
-        '''Syncs the local cache of backgrounds to Google Drive.'''
+        """Syncs the local cache of backgrounds to Google Drive."""
         if not self._auth():
             return False
 
@@ -456,11 +484,11 @@ class GoogleInterface:
             return True
 
     def _cache_thread(self):
-        '''Thread to regularly update config and data.'''
+        """Thread to regularly update config and data."""
         while True:
             current_secs = datetime.datetime.now().second
             next_update = next(x for x in sorted(
-                set(self._CONFIG_CACHE_TIMES + self._DATA_CACHE_TIMES)) if x > current_secs)
+                set(self._CONFIG_CACHE_TIMES + self._DATA_CACHE_TIMES + self._STATUS_UPDATE_TIMES)) if x > current_secs)
             time.sleep(next_update - current_secs)
 
             if next_update in self._CONFIG_CACHE_TIMES:
@@ -472,11 +500,15 @@ class GoogleInterface:
             if next_update in self._DATA_CACHE_TIMES:
                 self._update_data()
 
+            if next_update in self._STATUS_UPDATE_TIMES:
+                self._update_status()
+
     def start(self):
-        '''Updates the config and data immediately, then starts the caching thread.'''
+        """Updates the config and data immediately, then starts the caching thread."""
         config = self._update_config()
         if config != None and "background_folder" in config["general"] and config["general"]["background_folder"] != None:
             self._update_backgrounds(config["general"]["background_folder"])
         self._update_data()
+        self._update_status()
 
         threading.Thread(target=self._cache_thread, daemon=True).start()

@@ -5,7 +5,7 @@ from enum import Enum
 
 
 def log(output, before_text=""):
-    '''Log the output with a timestamp.'''
+    """Log the output with a timestamp."""
 
     if before_text == "":
         print(time.strftime("[%d/%b/%Y:%H:%M:%S] ") + output)
@@ -15,7 +15,7 @@ def log(output, before_text=""):
 
 
 def get_absolute_path(*path):
-    '''Returns the absolute path based on a path relative to this folder.'''
+    """Returns the absolute path based on a path relative to this folder."""
     joined_path = os.path.dirname(__file__)
     for item in path:
         joined_path = os.path.join(joined_path, item)
@@ -23,7 +23,7 @@ def get_absolute_path(*path):
 
 
 class ConnectionStatus(Enum):
-    '''The connection status of a single module.'''
+    """The connection status of a single module."""
 
     DISCONNECTED = 0
     WARNING = 1

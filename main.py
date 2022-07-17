@@ -8,7 +8,7 @@ from util import *
 from web_server import WebServer
 
 # Config
-SPREADSHEET_ID = ""
+SPREADSHEET_ID = "117g0337Ea0kCxR8ZTk7XVnB71pYxJREl-89_z05zCvQ"
 ENABLE_MONITOR = True
 
 # Cache paths
@@ -40,7 +40,7 @@ monitor = None
 
 
 def update_config_cache(new_config):
-    '''Callback to update the config cache from Google, writing to disk and pushing to all modules.'''
+    """Callback to update the config cache from Google, writing to disk and pushing to all modules."""
     global config_cache
 
     if new_config != config_cache:
@@ -52,7 +52,7 @@ def update_config_cache(new_config):
 
 
 def update_data_cache(new_data):
-    '''Callback to update the data cache from Google, pushing to all modules.'''
+    """Callback to update the data cache from Google, pushing to all modules."""
     global data_cache
 
     if new_data != data_cache:

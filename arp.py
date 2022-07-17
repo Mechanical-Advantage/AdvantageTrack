@@ -8,7 +8,7 @@ random_mac_address_pattern = re.compile(r"^.[26ae]")
 
 
 def get_mac_address(ip_address):
-    '''Uses arp to retrieve the MAC address for the specified IP address (Linux, macOS, and Windows).'''
+    """Uses arp to retrieve the MAC address for the specified IP address (Linux, macOS, and Windows)."""
 
     mac_address = None
 

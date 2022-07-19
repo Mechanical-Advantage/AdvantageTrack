@@ -507,9 +507,7 @@ class GoogleInterface:
 
     def start(self):
         """Updates the config and data immediately, then starts the caching thread."""
-        config = self._update_config()
-        if config != None and "background_folder" in config["general"] and config["general"]["background_folder"] != None:
-            self._update_backgrounds(config["general"]["background_folder"])
+        self._update_config()  # Don't update backgrounds immediately as this could take some time
         self._update_data()
         self._update_status()
 

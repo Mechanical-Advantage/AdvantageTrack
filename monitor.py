@@ -1,10 +1,6 @@
 import datetime
 import subprocess
 import threading
-from turtle import update
-from unittest import skip
-
-from charset_normalizer import detect
 
 from arp import get_mac_address
 from util import *

@@ -17,7 +17,6 @@ CRED_FILE_PATH = "google_credentials.json"
 CONFIG_CACHE_FILENAME = "config_cache.json"
 BACKGROUND_CACHE_FOLDER = "backgrounds"
 
-
 # Global variables
 config_cache = {"general": {}, "people": []}
 data_cache = {"devices": [], "records": []}

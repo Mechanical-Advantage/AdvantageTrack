@@ -20,6 +20,7 @@ export class PopupMenu {
 
     #addAddress = this.#menuDivs[3].getElementsByClassName("add-address")[0];
     #deviceDetailsName = this.#menuDivs[3].getElementsByClassName("title")[0].firstElementChild;
+    #deviceDetailsQrCode = this.#menuDivs[3].getElementsByClassName("qr-code")[0];
     #deviceDetailsListTitle = this.#menuDivs[3].children[3];
     #deviceDetailsList = this.#menuDivs[3].children[4];
 
@@ -33,6 +34,7 @@ export class PopupMenu {
     #connected = false;
     #thanksTimeout = null;
     #lastDeviceDetailsPerson = null;
+    #qrCodeManager = null;
 
     constructor() {
         document.addEventListener("configupdate", () => this.#updateTables());
@@ -42,6 +44,14 @@ export class PopupMenu {
         document.addEventListener("statusupdate", () => this.#updateStatus());
         Array.from(this.#menu.getElementsByClassName("close-button")).forEach((button) => {
             button.firstElementChild.addEventListener("click", () => this.setState(-1));
+        });
+
+        this.#qrCodeManager = new QRCode(this.#deviceDetailsQrCode, {
+            width: 512,
+            height: 512,
+            colorDark: "#000000",
+            colorLight: "#cfcfcf",
+            correctLevel: QRCode.CorrectLevel.L
         });
         document.addEventListener("addaddressupdate", () => this.#updateAddAddress());
         this.#updateAddAddress();
@@ -192,6 +202,8 @@ export class PopupMenu {
     /** Updates the displayed address for adding a device. */
     #updateAddAddress() {
         this.#addAddress.innerText = window.addAddress;
+        this.#qrCodeManager.clear();
+        this.#qrCodeManager.makeCode(window.addAddress);
     }
 
     /** Updates the device details page based on a person ID. */

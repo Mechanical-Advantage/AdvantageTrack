@@ -349,15 +349,35 @@ div.popup-menu div.thanks-message > span:last-child {
     font-size: 40px;
 }
 
-div.popup-menu div.manage-devices-details div.add-address {
+div.popup-menu div.manage-devices-details span.add-address {
     text-decoration: underline;
 }
 
-div.popup-menu div.manage-devices-details > div:nth-child(3) {
+div.popup-menu div.manage-devices-details > table:nth-child(3) {
     margin-top: 15px;
-    padding: 25px 35px 10px 35px;
-    font-size: 25px;
+    width: 100%;
     background-color: #cfcfcf;
+    border-collapse: collapse;
+}
+
+div.popup-menu div.manage-devices-details > table:nth-child(3) td:first-child {
+    padding: 25px 25px 10px 25px;
+    font-size: 25px;
+}
+
+div.popup-menu div.manage-devices-details > table:nth-child(3) td:last-child {
+    width: 250px;
+}
+
+div.popup-menu div.manage-devices-details > table:nth-child(3) td:last-child > div {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+div.popup-menu div.manage-devices-details > table:nth-child(3) td:last-child > div > img {
+    position: relative;
+    width: calc(100% - (25px * 2));
+    padding: 25px;
 }
 
 div.popup-menu div.manage-devices-details > div:nth-child(4) {

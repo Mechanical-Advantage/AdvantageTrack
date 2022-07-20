@@ -6,6 +6,7 @@
         <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
         <link rel="stylesheet" href="/static/index.css" />
         <script type="module" src="/static/index.js"></script>
+        <script src="/static/qrcode.js"></script>
         <script src="/static/unsupportedAlert.js"></script>
         <title>AdvantageTrack</title>
     </head>
@@ -69,17 +70,30 @@
             <div class="manage-devices-details">
                 <div class="close-button">(<span>Close</span>)</div>
                 <div class="title"><span></span>'s Devices</div>
-                <div>
-                    To register a new device:
-                    <ol>
-                        <li>Connect to our Wi-Fi network.</li>
-                        <li>
-                            On mobile: Tap the &#8505;&#65039; or &#9881;&#65039; next to the network in settings, then
-                            disable "private" or "randomized" MAC address.
-                        </li>
-                        <li>Navigate to "<span class="add-address"></span>" in a web browser.</li>
-                    </ol>
-                </div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                To register a new device:
+                                <ol>
+                                    <li>Connect to our Wi&#8209;Fi network.</li>
+                                    <li>
+                                        On mobile: Tap the &#8505;&#65039; or &#9881;&#65039; next to the network in the
+                                        Wi&#8209;Fi settings, then disable "Private Wi&#8209;Fi Address" or "Randomized
+                                        MAC".
+                                    </li>
+                                    <li>
+                                        Scan the QR code or navigate to "<span class="add-address"></span>" in a web
+                                        browser.
+                                    </li>
+                                </ol>
+                            </td>
+                            <td>
+                                <div class="qr-code"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div>0 devices registered.</div>
                 <div></div>
             </div>

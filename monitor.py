@@ -144,8 +144,8 @@ class Monitor:
                             person, last_seen + (config["general"]["auto_extension_mins"] * 60))
 
                 # Trigger manual timeouts
-                manual_timeouts = [x for x in data["records"] if x["start_manual"] and current_time -
-                                   x["start_time"] > config["general"]["manual_timeout_hours"] * 3600]
+                manual_timeouts = [x for x in data["records"] if x["start_manual"] and x["end_time"] ==
+                                   None and current_time - x["start_time"] > config["general"]["manual_timeout_hours"] * 3600]
                 for record in manual_timeouts:
                     self._sign_out_callback(
                         record["person"], record["start_time"] + (config["general"]["manual_extension_hours"] * 3600))

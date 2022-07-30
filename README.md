@@ -65,7 +65,7 @@ pip install -r requirements.txt
 
 ## Development
 
-The code is formatted using the [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) VSCode extensions (recommended for this workspace). Python is configured to [`autopep8`](https://pypi.org/project/autopep8/) while HTML, CSS, and JS use [Prettier](https://prettier.io).
+The code is formatted using the [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) VSCode extensions (recommended for this workspace). Python is configured with [`autopep8`](https://pypi.org/project/autopep8/) while HTML, CSS, and JS use [Prettier](https://prettier.io).
 
 The server functionality is divided into Python modules at the root level (launched from `main.py`). All of the HTML, CSS, and JS code is under the [`www`](www) folder.
 

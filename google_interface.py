@@ -103,9 +103,10 @@ class GoogleInterface:
             self._gspread_client = gspread.authorize(self._creds)
             self._gdrive_client = build(
                 "drive", "v3", credentials=self._creds)
-        except:
+        except Exception as e:
             log("Failed to connect to Google using cred file \"" +
-                self._CRED_FILE_PATH + "\"")
+                self._CRED_FILE_PATH + "\". The full message is displayed below.")
+            print(e)
             self._set_connection_status(ConnectionStatus.DISCONNECTED)
             return False
 
@@ -115,9 +116,10 @@ class GoogleInterface:
             self._gspread_spreadsheet = self._gspread_client.open_by_key(
                 self._SPREADSHEET_ID)
             sheets = self._gspread_spreadsheet.worksheets()
-        except:
+        except Exception as e:
             log("Failed to open Google Sheet with ID \"" +
-                self._SPREADSHEET_ID + "\"")
+                self._SPREADSHEET_ID + "\". The full message is displayed below.")
+            print(e)
             self._set_connection_status(ConnectionStatus.DISCONNECTED)
             return False
 

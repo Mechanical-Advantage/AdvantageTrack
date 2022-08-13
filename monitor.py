@@ -154,8 +154,11 @@ class Monitor:
                 log("Unknown error during monitor cycle")
                 self._set_connection_status(ConnectionStatus.DISCONNECTED)
 
-            time.sleep(self._get_config()["general"]
-                       ["ping_cycle_delay_secs"])
+            # Wait for next cycle
+            delay = 1
+            if "ping_cycle_delay_secs" in self._get_config()["general"]:
+                delay = self._get_config()["general"]["ping_cycle_delay_secs"]
+            time.sleep(delay)
 
     def start(self):
         """Starts the monitor thread."""

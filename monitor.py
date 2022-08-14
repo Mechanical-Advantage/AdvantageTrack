@@ -77,6 +77,8 @@ class Monitor:
                 detected_people = set()
                 for line in fping_lines:
                     line_split = line.split(" : ")
+                    if len(line_split) != 2:
+                        continue
                     ip_address = line_split[0].rstrip()
                     success = line_split[1] != "-"
 

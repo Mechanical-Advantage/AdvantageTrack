@@ -68,9 +68,10 @@ class Monitor:
                 ping_list = [x for x in all_ips if x not in skipped_ips]
                 fping = subprocess.Popen(
                     ["fping", "-C", "1", "-r", "0", "-t", str(config["general"]["ping_timeout_secs"] * 1000), "-q"] + ping_list, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                fping_lines = []
+                for line in fping.stderr.readlines():
+                    fping_lines.append(line.decode("utf-8")[:-1])
                 fping.wait()
-                _, stderr = fping.communicate()
-                fping_lines = stderr.decode("utf-8").split("\n")[:-1]
 
                 # Find successful detections
                 detected_macs = set()

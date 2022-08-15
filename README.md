@@ -21,6 +21,8 @@ The local server can run on Linux, Windows, or macOS. No special hardware or net
 
 2. In Google Drive, make a copy of this [Google Sheet](https://docs.google.com/spreadsheets/d/1_HIqFQeiEvepSQrMH_Ok9_99gfpYHOPBduymgrEUjlQ/edit?usp=sharing) and create a new folder for background images. Share these items to the service account email from your Google Cloud Project (the folder requires at least view access and the sheet requires at least edit access).
 
+    - Note: The provided spreadsheet uses eastern time by default. You can update the time zone under "File" > "Settings" > "Time zone". This time zone must match the selected time zone on the local server for the system to function properly.
+
 3. Check the configuration in the "Config - General" sheet (hover over each key for a detailed explanation). In particular, make sure to update the IP address range and background folder ID. You can also update the list of registered people in the "Config - People" sheet. **Note that the some of the sheets include sample rows. Don't delete these rows during setup; they are required for the server to correctly update the sheets.**
 
 4. Add some JPEG or PNG images to the backgrounds folder. These will be automatically downloaded by the server (and updated periodically).
@@ -39,7 +41,7 @@ The local server can run on Linux, Windows, or macOS. No special hardware or net
 
     - [ ] [`arp`](https://linuxhint.com/arp-command-linux/)
 
-    - [ ] [`fping`](http://fping.org)
+    - [ ] [`fping`](http://fping.org) --- [Installation instructions](FPING.md)
 
 9. Install the Python dependencies. We recommend using a virtual environment for this purpose:
 
@@ -59,7 +61,7 @@ venv\Scripts\activate.bat
 pip install -r requirements.txt
 ```
 
-9. Launch the `main.py` script in the virutal environment and navigate to http://127.0.0.1:8000 in a browser. The status of the system will be displayed at the bottom of the page. If the background folder was linked correctly, your custom images will appear on this page once the downloads finish (a default set will be used temporarily).
+9. Launch the `main.py` script in the virtual environment and navigate to http://127.0.0.1:8000 in a browser. The status of the system will be displayed at the bottom of the page. If the background folder was linked correctly, your custom images will appear on this page once the downloads finish (a default set will be used temporarily).
 
 10. If desired, configure the OS to automatically log in, start the `main.py` script, and open a browser.
 

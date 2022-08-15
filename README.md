@@ -41,7 +41,7 @@ The local server can run on Linux, Windows, or macOS. No special hardware or net
 
     - [ ] [`arp`](https://linuxhint.com/arp-command-linux/)
 
-    - [ ] [`fping`](http://fping.org) --- [Installation instructions](FPING.md)
+    - [ ] [`fping`](http://fping.org) ([Installation instructions](FPING.md))
 
 9. Install the Python dependencies. We recommend using a virtual environment for this purpose:
 

@@ -438,7 +438,7 @@ class GoogleInterface:
 
             # Get list from Google
             raw_data = self._gdrive_client.files().list(
-                q="'" + folder_id + "' in parents and (mimeType = 'image/jpeg' or mimeType = 'image/png')").execute()["files"]
+                q="'" + folder_id + "' in parents and (mimeType = 'image/jpeg' or mimeType = 'image/png')", supportsAllDrives=True, includeItemsFromAllDrives=True, corpora="allDrives").execute()["files"]
             google_images = []
             for google_image in raw_data:
                 google_images.append(google_image["id"] + "." +
@@ -459,7 +459,7 @@ class GoogleInterface:
 
                     # Download data
                     request = self._gdrive_client.files().get_media(
-                        fileId=image.split(".")[0])
+                        fileId=image.split(".")[0], supportsAllDrives=True)
                     image_data = io.BytesIO()
                     downloader = MediaIoBaseDownload(image_data, request)
                     done = False

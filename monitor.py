@@ -1,6 +1,7 @@
 import datetime
 import subprocess
 import threading
+import ipaddress
 
 from arp import get_mac_address
 from util import *
@@ -49,11 +50,12 @@ class Monitor:
             try:
                 # Get list of all IP addresses
                 all_ips = []
-                ip_range_start = config["general"]["ip_range_start"]
-                ip_range_end = config["general"]["ip_range_end"]
-                for i in range(int(ip_range_start.split(".")[-1]), int(ip_range_end.split(".")[-1]) + 1):
-                    all_ips.append(
-                        ".".join(ip_range_start.split(".")[:-1] + [str(i)]))
+                ip_range_start = ipaddress.IPv4Address(config["general"]["ip_range_start"])
+                ip_range_end = ipaddress.IPv4Address(config["general"]["ip_range_end"])
+                current_ip = ip_range_start
+                while current_ip <= ip_range_end:
+                    all_ips.append(str(current_ip))
+                    current_ip += 1
 
                 # Determine IP addresses to remove
                 skipped_ips = []
@@ -63,9 +65,8 @@ class Monitor:
                             skipped_ips.append(ip_address)
 
                 # Run flood ping
-                log("Running flood ping with " + str(len(skipped_ips)) +
-                    " skipped IP address" + ("" if len(skipped_ips) == 1 else "es"))
                 ping_list = [x for x in all_ips if x not in skipped_ips]
+                log("Running flood ping with " + str(len(ping_list)) + " IP address" + ("" if len(skipped_ips) == 1 else "es") + " (" + str(len(skipped_ips)) + " skipped)")
                 fping = subprocess.Popen(
                     ["fping", "-C", "1", "-r", "0", "-t", str(config["general"]["ping_timeout_secs"] * 1000), "-q"] + ping_list, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
                 fping_lines = []

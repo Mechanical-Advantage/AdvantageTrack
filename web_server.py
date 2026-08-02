@@ -1,6 +1,7 @@
 import json
 import random
 import threading
+import time
 
 import cherrypy
 import netifaces
@@ -17,11 +18,13 @@ class WebServer:
 
     _PORT = 8000
     _IP_MONITOR_PERIOD_SECS = 5
+    _AUTO_ADD_TIMEOUT_SECS = 10 * 60
 
     _monitor_status = ConnectionStatus.DISCONNECTED
     _google_status = ConnectionStatus.DISCONNECTED
     _ip_address = "127.0.0.1"
     _auto_add_person = None
+    _auto_add_time = 0
 
     def __init__(self, data_folder, background_cache_folder, get_config, get_data, sign_in_callback, sign_out_callback, add_device_callback, remove_device_callback):
         """
@@ -68,7 +71,8 @@ class WebServer:
             if mac_address != None:
                 is_random = random_mac_address_pattern.match(
                     mac_address) != None
-                if self._parent._auto_add_person != None and not is_random:
+                auto_add_expired = time.time() - self._parent._auto_add_time > self._parent._AUTO_ADD_TIMEOUT_SECS
+                if self._parent._auto_add_person != None and not is_random and not auto_add_expired:
                     google_success = self._parent._add_device_callback(
                         self._parent._auto_add_person, mac_address)
 
@@ -80,7 +84,7 @@ class WebServer:
                 html = html.replace("$(MAC)", mac_address)
                 if is_random:
                     html = html.replace("$(RESULT)", "FAILURE-RANDOM")
-                elif self._parent._auto_add_person == None:
+                elif self._parent._auto_add_person == None or auto_add_expired:
                     html = html.replace("$(RESULT)", "FAILURE-PERSON")
                 elif not google_success:
                     html = html.replace("$(RESULT)", "FAILURE-GOOGLE")
@@ -109,6 +113,7 @@ class WebServer:
                 self._parent._sign_out_callback(data)
             elif query == "auto_add":
                 self._parent._auto_add_person = data
+                self._parent._auto_add_time = time.time()
             elif query == "remove_device":
                 self._parent._remove_device_callback(
                     data["person"], data["mac"])
